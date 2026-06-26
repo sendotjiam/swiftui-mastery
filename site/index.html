@@ -1,0 +1,133 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>SwiftUI Study Deck</title>
+    <link rel="stylesheet" href="./assets/css/deck.css">
+</head>
+<body>
+    <div class="app-shell" data-loading="true">
+        <header class="topbar">
+            <div class="brand">
+                <span class="brand-mark" aria-hidden="true">S</span>
+                <div>
+                    <p>SwiftUI Study Deck</p>
+                    <span>Foundations and interview practice</span>
+                </div>
+            </div>
+
+            <div class="topbar-actions">
+                <button type="button" class="icon-button" id="openSearch" aria-label="Open search">Search</button>
+                <button type="button" class="icon-button" id="toggleStar" aria-label="Star current slide">Star</button>
+                <button type="button" class="icon-button" id="openSource" aria-label="Open full source">Source</button>
+            </div>
+        </header>
+
+        <div class="progress-track" aria-hidden="true">
+            <div class="progress-fill" id="progressFill"></div>
+        </div>
+
+        <aside class="thumb-rail" aria-label="Slide thumbnails">
+            <div class="rail-header">
+                <span id="slideCount">Loading</span>
+                <button type="button" id="clearFilters">Clear</button>
+            </div>
+            <div class="thumb-list" id="thumbList"></div>
+        </aside>
+
+        <main class="stage" id="stage" tabindex="-1" aria-live="polite">
+            <article class="slide-card loading-card">
+                <p class="eyebrow">Loading markdown</p>
+                <h1>Preparing the deck</h1>
+                <p>The slides are generated directly from the source markdown files.</p>
+            </article>
+        </main>
+
+        <aside class="study-panel" aria-label="Deck controls">
+            <section class="panel-section">
+                <p class="panel-label">Mode</p>
+                <div class="segmented" role="group" aria-label="Source filter">
+                    <button type="button" class="is-active" data-source-filter="all">All</button>
+                    <button type="button" data-source-filter="foundations">Foundations</button>
+                    <button type="button" data-source-filter="faq">FAQ</button>
+                </div>
+            </section>
+
+            <section class="panel-section">
+                <p class="panel-label">Difficulty</p>
+                <div class="segmented vertical" role="group" aria-label="Difficulty filter">
+                    <button type="button" class="is-active" data-difficulty-filter="all">All levels</button>
+                    <button type="button" data-difficulty-filter="Beginner">Beginner</button>
+                    <button type="button" data-difficulty-filter="Intermediate">Intermediate</button>
+                    <button type="button" data-difficulty-filter="Senior">Senior</button>
+                </div>
+            </section>
+
+            <section class="panel-section">
+                <p class="panel-label">Current slide</p>
+                <div class="stat-grid">
+                    <div>
+                        <strong id="currentNumber">0</strong>
+                        <span>Slide</span>
+                    </div>
+                    <div>
+                        <strong id="viewedCount">0</strong>
+                        <span>Viewed</span>
+                    </div>
+                    <div>
+                        <strong id="starredCount">0</strong>
+                        <span>Starred</span>
+                    </div>
+                </div>
+            </section>
+
+            <section class="panel-section">
+                <p class="panel-label">Jump</p>
+                <div id="relatedList" class="related-list"></div>
+            </section>
+        </aside>
+
+        <nav class="deck-controls" aria-label="Slide navigation">
+            <button type="button" id="prevSlide" class="nav-button" aria-label="Previous slide">Prev</button>
+            <div class="counter" id="counter">0 / 0</div>
+            <button type="button" id="nextSlide" class="nav-button" aria-label="Next slide">Next</button>
+        </nav>
+    </div>
+
+    <div class="modal" id="searchModal" hidden>
+        <div class="modal-backdrop" data-close-modal></div>
+        <section class="modal-panel search-panel" role="dialog" aria-modal="true" aria-labelledby="searchTitle">
+            <header>
+                <div>
+                    <p class="eyebrow">Jump to slide</p>
+                    <h2 id="searchTitle">Search the complete deck</h2>
+                </div>
+                <button type="button" class="icon-button" data-close-modal>Close</button>
+            </header>
+            <label class="search-box">
+                <span>Search terms</span>
+                <input id="searchInput" type="search" autocomplete="off" placeholder="identity, @State, Task, testing">
+            </label>
+            <div class="search-results" id="searchResults"></div>
+        </section>
+    </div>
+
+    <div class="modal" id="contentModal" hidden>
+        <div class="modal-backdrop" data-close-modal></div>
+        <section class="modal-panel content-panel" role="dialog" aria-modal="true" aria-labelledby="contentTitle">
+            <header>
+                <div>
+                    <p class="eyebrow" id="contentEyebrow">Source</p>
+                    <h2 id="contentTitle">Full content</h2>
+                </div>
+                <button type="button" class="icon-button" data-close-modal>Close</button>
+            </header>
+            <div class="modal-content markdown-body" id="contentBody"></div>
+        </section>
+    </div>
+
+    <script src="./assets/js/deck-parser.js"></script>
+    <script src="./assets/js/deck-app.js"></script>
+</body>
+</html>
