@@ -1,4 +1,4 @@
-# 🚀 SwiftUI Mastery & Study Deck
+# <img src="site/assets/images/favicon.png" width="36" height="36" align="center" alt="App Icon"> 🚀 SwiftUI Mastery & Study Deck
 
 [![Live Demo](https://img.shields.io/badge/Live-Demo-brightgreen.svg?style=for-the-badge)](https://swiftui-mastery.vercel.app/)
 [![Vercel Deployment](https://img.shields.io/badge/Deployed_on-Vercel-black?style=for-the-badge&logo=vercel)](https://swiftui-mastery.vercel.app/)
