@@ -1,56 +1,77 @@
-# SwiftUI Study Deck
+# 🚀 SwiftUI Mastery & Study Deck
 
-An interactive, local-first slide deck generated from the SwiftUI Foundations guide and the iOS/SwiftUI interview FAQ.
+[![Live Demo](https://img.shields.io/badge/Live-Demo-brightgreen.svg?style=for-the-badge)](https://swiftui-mastery.vercel.app/)
+[![Vercel Deployment](https://img.shields.io/badge/Deployed_on-Vercel-black?style=for-the-badge&logo=vercel)](https://swiftui-mastery.vercel.app/)
+[![HTML/CSS/JS](https://img.shields.io/badge/Built_with-HTML/CSS/JS-blue?style=for-the-badge)](https://developer.mozilla.org/en-US/docs/Web)
 
-[Open the deck](http://localhost:4173/site/) after starting the local server.
+> An interactive, beautifully designed, local-first web slide deck generated dynamically from Markdown sources, focused on the **SwiftUI Foundations guide** and **iOS/SwiftUI interview FAQ**.
+
+✨ **[Experience the live interactive deck here!](https://swiftui-mastery.vercel.app/)** ✨
 
 ![SwiftUI Study Deck preview](site/assets/images/deck-preview.png)
 
-## Quick Start
+## 📖 What is this project?
+
+**SwiftUI Mastery** is a comprehensive educational resource designed to help iOS developers master SwiftUI concepts and prepare for technical interviews. Instead of reading long, static markdown files, this project parses raw Markdown documentation and dynamically turns them into a slick, presentation-style **Study Deck**. 
+
+It acts as both a **learning tool** and an **interview prep guide**, offering bite-sized, navigable slides covering everything from SwiftUI architecture (@State, @Binding) to advanced layout strategies and common interview questions.
+
+## 🎯 What does it do?
+
+- ⚡️ **Dynamic Parsing**: Automatically reads and converts the `docs/*.md` files into a 500+ slide presentation in real-time in the browser.
+- 🎛️ **Interactive Controls**: Supports keyboard shortcuts, touch swipes, and full-screen modes for an optimal studying experience.
+- 🔍 **Global Search & Filters**: Filter slides by topic (Foundations vs FAQ) or difficulty (Beginner, Intermediate, Senior), and instantly search the entire deck.
+- 🛠️ **Deep Dive Capability**: Allows you to expand code blocks, tables, and even Mermaid diagrams to study complex concepts without losing context.
+- 🚀 **Static & Fast**: Deploys seamlessly as a static site (e.g., on Vercel) while keeping the content easily editable via Markdown.
+
+---
+
+## 🛠️ Quick Start (Local Development)
+
+If you'd prefer to run the project locally on your machine instead of using the live link, follow these steps:
 
 ```bash
+# Start a local web server (Python)
 cd /Users/sendo.tjiamis/Workspaces/SwiftUI-Foundation
 python3 -m http.server 4173
 ```
 
-Then open:
-
+Then open your browser to:
 ```text
 http://localhost:4173/site/
 ```
 
-Use left/right arrows, swipe, or the on-screen navigation buttons to move through the deck.
+*Note: A local server is required because modern browsers block JavaScript `fetch()` calls for local files (`file://` protocol) due to security restrictions.*
 
-## Interactive Controls
+## ⌨️ Interactive Controls
 
 <details open>
-<summary>Study controls</summary>
+<summary><strong>Study Controls</strong></summary>
 
-- `Left` / `Right`: previous or next slide
-- `/`: open search
-- `S`: star the current slide
-- `Esc`: close search or source modal
-- Source filters: all slides, Foundations only, or FAQ only
-- Difficulty filters: Beginner, Intermediate, Senior
-- Full source: opens the complete markdown block for the current slide
-- Expand: opens wide code blocks, tables, or diagrams in a focused view
+- `Left` / `Right`: Previous or next slide
+- `/`: Open search
+- `S`: Star the current slide
+- `Esc`: Close search or source modal
+- **Source filters:** All slides, Foundations only, or FAQ only
+- **Difficulty filters:** Beginner, Intermediate, Senior
+- **Full source:** Opens the complete markdown block for the current slide
+- **Expand:** Opens wide code blocks, tables, or diagrams in a focused view
 
 </details>
 
 <details>
-<summary>Content coverage</summary>
+<summary><strong>Content Coverage</strong></summary>
 
 The deck treats the markdown files in `docs/` as canonical data sources:
 
 - `docs/swiftui-foundations.md`
 - `docs/swift-ios-swiftui-interview-faq.md`
 
-The source files are parsed into 575 slides. Long sections become continuation slides instead of being truncated.
-
+The source files are parsed into over 575 slides. Long sections seamlessly become continuation slides instead of being truncated.
 </details>
 
 <details>
-<summary>Folder map</summary>
+<summary><strong>Project Structure</strong></summary>
 
 ```text
 docs/
@@ -69,17 +90,15 @@ site/
   tools/layout-audit.js
   tools/capture-deck-preview.js
 ```
-
 </details>
 
-## Verification
+## 🧪 Verification & Auditing
+
+For development checks on the parser and UI:
 
 ```bash
 node --check site/assets/js/deck-parser.js
 node --check site/assets/js/deck-app.js
-node --check site/tools/content-audit.js
-node --check site/tools/layout-audit.js
-node --check site/tools/capture-deck-preview.js
 node site/tools/content-audit.js
 ```
 
@@ -96,19 +115,15 @@ For rendered layout checks, start Chrome with remote debugging, then run the aud
 node site/tools/layout-audit.js
 ```
 
-## Regenerate Preview
+## 📸 Regenerate Preview
 
-With the local server and debug Chrome running:
+With the local server and debug Chrome running, run the following to capture a new preview screenshot:
 
 ```bash
 node site/tools/capture-deck-preview.js
 ```
 
-This updates:
-
-```text
-site/assets/images/deck-preview.png
-```
+This automatically updates `site/assets/images/deck-preview.png`.
 
 ---
 *Generated with AI coding assistant*
