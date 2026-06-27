@@ -124,6 +124,3 @@ node site/tools/capture-deck-preview.js
 ```
 
 This automatically updates `site/assets/images/deck-preview.png`.
-
----
-*Generated with AI coding assistant*
