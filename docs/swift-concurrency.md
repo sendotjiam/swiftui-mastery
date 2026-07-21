@@ -523,3 +523,315 @@ func fetchDashboardData() async throws -> Dashboard {
     return try await Dashboard(user: user, settings: settings, feed: feed)
 }
 ```
+
+## Advanced Concurrency Topics
+
+### [Senior] What is Unstructured Concurrency and when should you use it?
+**Interview answer:**  
+Unstructured concurrency allows you to create tasks that outlive their calling scope. You use it to bridge synchronous code into asynchronous code or for fire-and-forget background work where structured concurrency (`async let` or `TaskGroup`) isn't possible.
+
+**Deep explanation:**  
+Unlike structured tasks which guarantee that child tasks complete before the parent does (and automatically handle cancellation propagation), unstructured tasks (`Task` and `Task.detached`) have independent lifecycles.
+
+**Why it matters:**  
+Sometimes you need to kick off async work from a non-async context, such as a button tap action or a view lifecycle method (`onAppear`).
+
+**How it works:**  
+You initialize a `Task` closure. You can keep a reference to this `Task` object if you need to manually cancel it later using `task.cancel()`.
+
+**Use cases:**  
+Bridging synchronous UI callbacks to async methods, detached background processing, and tracking long-lived async streams that outlive a single function call.
+
+**Common mistakes:**  
+Overusing unstructured concurrency where `TaskGroup` or `async let` would be safer. Failing to retain a reference to a long-running task, making it impossible to cancel.
+
+**Best practices:**  
+Always prefer structured concurrency. When using unstructured tasks, explicitly handle their cancellation tied to the lifecycle of the owning object (e.g., cancelling tasks when a view model is deinitialized).
+
+**Red flag answers:**  
+"Unstructured concurrency is just bad practice." It is actually essential for bridging sync and async code in iOS.
+
+**Code example:**  
+```swift
+@MainActor
+class ViewModel: ObservableObject {
+    @Published var data: String = ""
+    private var loadTask: Task<Void, Never>?
+
+    func loadData() {
+        // Bridging synchronous to asynchronous
+        loadTask?.cancel()
+        loadTask = Task {
+            let result = try? await networkService.fetch()
+            guard !Task.isCancelled else { return }
+            self.data = result ?? "Failed"
+        }
+    }
+    
+    deinit {
+        loadTask?.cancel()
+    }
+}
+```
+
+**Possible follow-up questions:**  
+How do you cancel an unstructured task? What is the difference between `Task` and `Task.detached`?
+
+### [Senior] What is the difference between `Task` and `Task.detached`?
+**Interview answer:**  
+`Task` inherits the context of its caller, such as actor isolation, task-local values, and priority. `Task.detached` intentionally breaks away from the caller's context and runs independently.
+
+**Deep explanation:**  
+If you create a standard `Task` from inside a `@MainActor` class, the `Task` will also run on the Main Actor, making UI updates safe. `Task.detached`, however, is completely separated. It won't run on the Main Actor and won't inherit `@TaskLocal` variables.
+
+**Why it matters:**  
+Using `Task` prevents accidental data races when updating UI state. Using `Task.detached` is critical when you have heavy CPU work that must not block the actor that spawned it (especially the Main Actor).
+
+**How it works:**  
+`Task.detached` schedules the work on the global concurrent pool without any inherited context.
+
+**Use cases:**  
+`Task` is used for general async work kicked off from views. `Task.detached` is used for heavy background work like video compression, file parsing, or large image processing.
+
+**Common mistakes:**  
+Using `Task` for heavy CPU work on the Main Actor, leading to UI freezes. Using `Task.detached` and then directly updating UI state without hopping back to the Main Actor.
+
+**Best practices:**  
+Default to `Task`. Only use `Task.detached` when you explicitly need to escape the current actor isolation for heavy lifting.
+
+**Red flag answers:**  
+"Task.detached runs on a background thread while Task runs on the main thread." `Task` simply inherits its parent's isolation; it doesn't guarantee the main thread unless the parent was isolated to the Main Actor.
+
+**Code example:**  
+```swift
+@MainActor
+func compressVideo(url: URL) {
+    // If we used Task { ... }, it would block the UI!
+    Task.detached(priority: .background) {
+        // Runs on a background thread in the global concurrent pool
+        let compressed = await VideoProcessor.compress(url: url)
+        
+        // Explicitly hop back to the MainActor to update the UI
+        await MainActor.run {
+            // Update UI here
+        }
+    }
+}
+```
+
+**Possible follow-up questions:**  
+Does `Task.detached` inherit priority? How do you pass data back to the Main Actor?
+
+### [Senior] How do you bridge legacy callback APIs to Swift Concurrency?
+**Interview answer:**  
+You use continuations, specifically `withCheckedContinuation` or `withCheckedThrowingContinuation`, to wrap callback-based functions into `async` functions.
+
+**Deep explanation:**  
+Continuations pause the current task and provide a closure to resume it later. You pass the continuation into the legacy callback, and when the callback completes, you resume the continuation with a value or error.
+
+**Why it matters:**  
+Most older iOS APIs and many third-party SDKs still rely on completion handlers. Continuations allow you to integrate these cleanly into modern `async/await` flows.
+
+**How it works:**  
+The task suspends at the `await` point. The continuation is resumed exactly once, which unsuspends the task and returns the value (or throws the error) back to the caller.
+
+**Use cases:**  
+Wrapping legacy `URLSession` data tasks (pre-iOS 15), older location managers, third-party network SDKs, and custom delegate-based flows.
+
+**Common mistakes:**  
+Resuming the continuation more than once (causes a crash). Failing to resume the continuation entirely (causes a task leak, suspending forever).
+
+**Best practices:**  
+Always use "checked" continuations in development, as they log warnings or crash reliably if misused. Keep the continuation-wrapping code as close to the legacy API as possible.
+
+**Red flag answers:**  
+"You can just put the callback inside a Task." Putting a callback in a Task doesn't make the outer function `async`.
+
+**Code example:**  
+```swift
+// Legacy API
+func fetchUser(id: String, completion: @escaping (Result<User, Error>) -> Void) { /* ... */ }
+
+// Modern wrapper
+func fetchUserAsync(id: String) async throws -> User {
+    return try await withCheckedThrowingContinuation { continuation in
+        fetchUser(id: id) { result in
+            switch result {
+            case .success(let user):
+                continuation.resume(returning: user) // Resume exactly once
+            case .failure(let error):
+                continuation.resume(throwing: error) // Resume exactly once
+            }
+        }
+    }
+}
+```
+
+**Possible follow-up questions:**  
+What happens if you forget to resume a checked continuation? Can you use continuations to return multiple values over time?
+
+### [Senior] What are AsyncSequence and AsyncStream?
+**Interview answer:**  
+`AsyncSequence` is a protocol for receiving a sequence of values over time asynchronously, similar to a standard `Sequence` but using `for await`. `AsyncStream` is a concrete implementation of `AsyncSequence` used to create your own asynchronous streams from scratch.
+
+**Deep explanation:**  
+While `async/await` returns a single value, `AsyncSequence` yields multiple values incrementally. You can map, filter, and iterate over them just like standard arrays, but they suspend while waiting for the next value.
+
+**Why it matters:**  
+It provides a native Swift concurrency alternative to Combine or RxSwift for handling streams of events, like location updates, web socket messages, or reading files line-by-line.
+
+**How it works:**  
+The `for await` loop asks the sequence for its next element. If the element isn't ready, the task suspends until it is.
+
+**Use cases:**  
+Reading streaming data (`URL.lines`), listening to `NotificationCenter` events (`NotificationCenter.default.notifications`), wrapping delegate callbacks that fire multiple times.
+
+**Common mistakes:**  
+Blocking the `for await` loop with heavy synchronous work, delaying the processing of the next element.
+
+**Best practices:**  
+Use `AsyncStream` to wrap legacy delegate APIs (like `CLLocationManager`) into modern asynchronous streams.
+
+**Red flag answers:**  
+"AsyncSequence is just an array of tasks." It doesn't hold tasks; it yields values asynchronously over time.
+
+**Code example:**  
+```swift
+class LocationTracker {
+    func startTracking() -> AsyncStream<CLLocation> {
+        AsyncStream { continuation in
+            let manager = CLLocationManager()
+            let delegate = LocationDelegate(
+                onUpdate: { location in
+                    continuation.yield(location) // Send values
+                },
+                onFinish: {
+                    continuation.finish() // Close stream
+                }
+            )
+            manager.delegate = delegate
+            manager.startUpdatingLocation()
+            
+            continuation.onTermination = { @Sendable _ in
+                manager.stopUpdatingLocation()
+            }
+        }
+    }
+}
+
+// Usage
+Task {
+    for await location in tracker.startTracking() {
+        print("New location: \(location)")
+    }
+}
+```
+
+**Possible follow-up questions:**  
+How does `AsyncSequence` differ from Combine's `Publisher`?
+
+### [Senior] What is Actor Reentrancy and why is it dangerous?
+**Interview answer:**  
+Actor reentrancy means that while an actor is suspended at an `await` point, it frees up its executor to process other pending tasks. This is dangerous because the actor's state might change while it is suspended, breaking assumptions made before the `await`.
+
+**Deep explanation:**  
+Actors guarantee mutually exclusive access to their state, but they do not guarantee atomic execution across suspension points. If Task A calls an actor method and hits an `await`, the actor can begin processing Task B. Task B might mutate the state. When Task A resumes, the state is no longer what it was before the `await`.
+
+**Why it matters:**  
+It prevents deadlocks but creates logical race conditions. Developers often assume actors behave like serial queues, but reentrancy breaks that assumption.
+
+**How it works:**  
+When an `await` happens, the task gives up the actor's executor. Other tasks queued in the actor's "mailbox" can run. When the original task's `await` finishes, it gets back in line to resume on the actor.
+
+**Use cases:**  
+Commonly seen in caching (two requests for the same image start before the first finishes), bank account deductions, or any stateful operation involving network calls.
+
+**Common mistakes:**  
+Assuming that checking state before an `await` means the state will be the same after the `await`.
+
+**Best practices:**  
+Perform all state mutations synchronously. If you must read state, `await` an operation, and then write state, you must re-verify the preconditions after the `await`.
+
+**Red flag answers:**  
+"Actors prevent all race conditions." Actors prevent data races, but reentrancy can cause logical race conditions.
+
+**Code example:**  
+```swift
+actor BankAccount {
+    var balance: Decimal = 100
+    
+    // BAD Example (Dangerous):
+    func withdrawDangerous(amount: Decimal) async throws {
+        guard balance >= amount else { throw Error.insufficientFunds }
+        let isFraud = await fraudChecker.check(amount) // Actor suspends here!
+        if !isFraud {
+            // DANGER: balance might have been withdrawn by another task!
+            balance -= amount 
+        }
+    }
+
+    // GOOD Example (Safe):
+    func withdrawSafe(amount: Decimal) async throws {
+        let isFraud = await fraudChecker.check(amount) // Suspend FIRST
+        
+        // Synchronous critical section
+        guard !isFraud else { throw Error.fraudDetected }
+        guard balance >= amount else { throw Error.insufficientFunds }
+        
+        balance -= amount // Safe! No suspends happened between the check and mutation
+    }
+}
+```
+
+**Possible follow-up questions:**  
+Can you completely disable actor reentrancy in Swift? (No, but you can use locks or structured queues internally if absolutely necessary).
+
+### [Senior] What are Task Local Values (`@TaskLocal`)?
+**Interview answer:**  
+`@TaskLocal` provides a way to implicitly pass contextual data (like request IDs or logger instances) down an asynchronous call stack without explicitly passing it as a function parameter.
+
+**Deep explanation:**  
+When a task-local value is bound, any child tasks (`async let`, `TaskGroup`) or unstructured tasks (`Task { }`) created within that scope will automatically inherit the value. 
+
+**Why it matters:**  
+It keeps APIs clean by preventing "parameter pollution," where every function needs an extra parameter just to pass context along.
+
+**How it works:**  
+You declare a static property wrapped with `@TaskLocal`. You bind a value using `withValue(_:operation:)`, and any async function called inside that operation can read the value.
+
+**Use cases:**  
+Distributed tracing, request IDs, user sessions, contextual loggers, and dependency injection in deep async hierarchies.
+
+**Common mistakes:**  
+Trying to mutate a `@TaskLocal` value. They are immutable and can only be set via binding scopes.
+
+**Best practices:**  
+Use them sparingly for cross-cutting concerns like logging or tracing, rather than for core business logic data transfer.
+
+**Red flag answers:**  
+"TaskLocal is like a global variable." It's scoped specifically to a task hierarchy and is thread-safe, unlike traditional mutable global variables.
+
+**Code example:**  
+```swift
+enum LoggerContext {
+    @TaskLocal static var requestID: String?
+}
+
+func processRequest() async {
+    // Read the value deeply in the call stack
+    if let id = LoggerContext.requestID {
+        print("[Request: \(id)] Processing...")
+    }
+}
+
+func handleIncomingRequest(id: String) async {
+    // Bind the value for the duration of the closure
+    await LoggerContext.$requestID.withValue(id) {
+        // Any async functions called here will inherit the requestID
+        await processRequest() 
+    }
+}
+```
+
+**Possible follow-up questions:**  
+Does `Task.detached` inherit `@TaskLocal` values? (No, it does not.)

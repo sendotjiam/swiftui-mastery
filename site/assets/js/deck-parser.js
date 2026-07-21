@@ -47,6 +47,14 @@
             file: "docs/swiftui-core.md",
             browserPath: "../docs/swiftui-core.md",
             expected: {}
+        },
+        {
+            id: "faq",
+            shortTitle: "Interview FAQ",
+            title: "iOS and SwiftUI Interview FAQ",
+            file: "docs/interview-faq.md",
+            browserPath: "../docs/interview-faq.md",
+            expected: {}
         }
     ];
 
