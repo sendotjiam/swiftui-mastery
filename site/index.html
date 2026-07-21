@@ -51,6 +51,15 @@
 
         <aside class="study-panel" aria-label="Deck controls">
             <section class="panel-section">
+                <p class="panel-label">Mode</p>
+                <div class="segmented" role="group" aria-label="Mode filter">
+                    <button type="button" class="is-active" data-mode-filter="all">All</button>
+                    <button type="button" data-mode-filter="study">Study</button>
+                    <button type="button" data-mode-filter="faq">Interview FAQ</button>
+                </div>
+            </section>
+            
+            <section class="panel-section">
                 <p class="panel-label">Topic</p>
                 <div class="segmented" role="group" aria-label="Source filter" style="flex-wrap: wrap;">
                     <button type="button" class="is-active" data-source-filter="all">All</button>
@@ -59,7 +68,7 @@
                     <button type="button" data-source-filter="arc">ARC</button>
                     <button type="button" data-source-filter="state">State</button>
                     <button type="button" data-source-filter="core">SwiftUI</button>
-                    <button type="button" data-source-filter="faq">Interview FAQ</button>
+                    <button type="button" data-source-filter="faq">General FAQ</button>
                 </div>
             </section>
 

@@ -11,6 +11,7 @@
         activeIndex: 0,
         direction: "next",
         filters: {
+            mode: "all",
             source: "all",
             difficulty: "all",
             query: ""
@@ -112,6 +113,14 @@
             button.addEventListener("click", () => {
                 state.filters.source = button.dataset.sourceFilter;
                 setActiveButton("[data-source-filter]", button);
+                renderNavigation();
+            });
+        });
+
+        document.querySelectorAll("[data-mode-filter]").forEach((button) => {
+            button.addEventListener("click", () => {
+                state.filters.mode = button.dataset.modeFilter;
+                setActiveButton("[data-mode-filter]", button);
                 renderNavigation();
             });
         });
@@ -423,6 +432,13 @@
     function getFilteredSlides() {
         const query = state.filters.query.toLowerCase();
         return state.slides.filter((slide) => {
+            if (state.filters.mode === "study" && (slide.kind === "faq" || slide.kind === "mock")) {
+                return false;
+            }
+            if (state.filters.mode === "faq" && slide.kind !== "faq" && slide.kind !== "mock") {
+                return false;
+            }
+
             if (state.filters.source !== "all" && slide.sourceId !== state.filters.source) {
                 return false;
             }
@@ -550,10 +566,15 @@
     }
 
     function clearFilters() {
+        state.filters.mode = "all";
         state.filters.source = "all";
         state.filters.difficulty = "all";
         state.filters.query = "";
         els.searchInput.value = "";
+        
+        document.querySelectorAll("[data-mode-filter]").forEach((button) => {
+            button.classList.toggle("is-active", button.dataset.modeFilter === "all");
+        });
         document.querySelectorAll("[data-source-filter]").forEach((button) => {
             button.classList.toggle("is-active", button.dataset.sourceFilter === "all");
         });
