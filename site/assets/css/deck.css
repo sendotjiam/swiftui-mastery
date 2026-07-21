@@ -450,16 +450,17 @@ input:focus-visible,
 }
 
 .segmented {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
+    display: flex;
+    flex-wrap: wrap;
     gap: 6px;
 }
 
 .segmented.vertical {
-    grid-template-columns: 1fr;
+    flex-direction: column;
 }
 
 .segmented button {
+    flex: 1 1 auto;
     min-height: 36px;
     padding: 0 8px;
     font-size: 12px;
