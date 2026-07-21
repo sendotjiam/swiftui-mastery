@@ -1168,13 +1168,18 @@ th {
 button, .thumb, .source-link, .pill, input {
     border: 2px solid var(--ink) !important;
     border-radius: 0 !important;
-    transition: transform 0.1s, box-shadow 0.1s, background 0.1s !important;
+    transition: transform 0.1s, box-shadow 0.1s, background 0.1s, color 0.1s !important;
 }
 
 button:hover, .thumb:hover, .source-link:hover, .pill:hover {
     transform: translate(-2px, -2px) !important;
     box-shadow: 4px 4px 0px var(--ink) !important;
     background: #fff !important;
+    color: var(--ink) !important;
+}
+
+button:hover *, .thumb:hover * {
+    color: var(--ink) !important;
 }
 
 button:active, .thumb:active, .source-link:active, .pill:active {
@@ -1186,8 +1191,15 @@ button:active, .thumb:active, .source-link:active, .pill:active {
     background: var(--ink) !important;
     color: var(--panel) !important;
 }
+.is-active:hover, button.is-active:hover {
+    background: #fff !important;
+    color: var(--ink) !important;
+}
 .is-active .thumb-topic {
     color: #cccccc !important;
+}
+.is-active:hover .thumb-topic {
+    color: var(--muted) !important;
 }
 
 .slide-header {
@@ -1210,5 +1222,6 @@ button:active, .thumb:active, .source-link:active, .pill:active {
 
 .code-frame pre {
     background: #FAFAFA !important;
+    color: var(--ink) !important;
 }
 
