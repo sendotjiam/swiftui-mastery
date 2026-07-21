@@ -1191,8 +1191,14 @@ button:active, .thumb:active, .source-link:active, .pill:active {
     background: var(--ink) !important;
     color: var(--panel) !important;
 }
+.is-active .thumb-title {
+    color: var(--panel) !important;
+}
 .is-active:hover, button.is-active:hover {
     background: #fff !important;
+    color: var(--ink) !important;
+}
+.is-active:hover .thumb-title {
     color: var(--ink) !important;
 }
 .is-active .thumb-topic {
@@ -1223,5 +1229,12 @@ button:active, .thumb:active, .source-link:active, .pill:active {
 .code-frame pre {
     background: #FAFAFA !important;
     color: var(--ink) !important;
+}
+
+/* Modals */
+.modal-panel {
+    background: var(--panel) !important;
+    border: 2px solid var(--ink) !important;
+    box-shadow: 8px 8px 0px var(--ink) !important;
 }
 
