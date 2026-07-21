@@ -6,6 +6,9 @@
     <title>SwiftUI Study Deck</title>
     <link rel="icon" type="image/png" href="./assets/images/favicon.png">
     <link rel="apple-touch-icon" href="./assets/images/favicon.png">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Space+Grotesk:wght@400;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="./assets/css/deck.css">
 </head>
 <body>
@@ -48,11 +51,14 @@
 
         <aside class="study-panel" aria-label="Deck controls">
             <section class="panel-section">
-                <p class="panel-label">Mode</p>
-                <div class="segmented" role="group" aria-label="Source filter">
+                <p class="panel-label">Topic</p>
+                <div class="segmented" role="group" aria-label="Source filter" style="flex-wrap: wrap;">
                     <button type="button" class="is-active" data-source-filter="all">All</button>
-                    <button type="button" data-source-filter="foundations">Foundations</button>
-                    <button type="button" data-source-filter="faq">FAQ</button>
+                    <button type="button" data-source-filter="fundamentals">Swift</button>
+                    <button type="button" data-source-filter="concurrency">Concurrency</button>
+                    <button type="button" data-source-filter="arc">ARC</button>
+                    <button type="button" data-source-filter="state">State</button>
+                    <button type="button" data-source-filter="core">SwiftUI</button>
                 </div>
             </section>
 

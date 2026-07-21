@@ -9,35 +9,44 @@
 
     const SOURCES = [
         {
-            id: "foundations",
-            shortTitle: "Foundations",
-            title: "SwiftUI Foundations: From Fundamentals to Mastery",
-            file: "docs/swiftui-foundations.md",
-            browserPath: "../docs/swiftui-foundations.md",
-            expected: {
-                lineCount: 2210,
-                h1: 1,
-                h2: 24,
-                h3: 200,
-                codeBlocks: 37,
-                mermaidBlocks: 18
-            }
+            id: "fundamentals",
+            shortTitle: "Fundamentals",
+            title: "Swift Fundamentals",
+            file: "docs/swift-fundamentals.md",
+            browserPath: "../docs/swift-fundamentals.md",
+            expected: {}
         },
         {
-            id: "faq",
-            shortTitle: "FAQ",
-            title: "Swift, iOS, and SwiftUI Interview FAQ",
-            file: "docs/swift-ios-swiftui-interview-faq.md",
-            browserPath: "../docs/swift-ios-swiftui-interview-faq.md",
-            expected: {
-                lineCount: 6754,
-                h1: 1,
-                h2: 26,
-                h3: 159,
-                faqEntries: 151,
-                codeBlocks: 151,
-                mockQuestions: 8
-            }
+            id: "concurrency",
+            shortTitle: "Concurrency",
+            title: "Swift Concurrency",
+            file: "docs/swift-concurrency.md",
+            browserPath: "../docs/swift-concurrency.md",
+            expected: {}
+        },
+        {
+            id: "arc",
+            shortTitle: "ARC",
+            title: "ARC and Memory Management",
+            file: "docs/arc-memory-management.md",
+            browserPath: "../docs/arc-memory-management.md",
+            expected: {}
+        },
+        {
+            id: "state",
+            shortTitle: "State",
+            title: "SwiftUI State Management",
+            file: "docs/swiftui-state-management.md",
+            browserPath: "../docs/swiftui-state-management.md",
+            expected: {}
+        },
+        {
+            id: "core",
+            shortTitle: "SwiftUI Core",
+            title: "SwiftUI Core Concepts",
+            file: "docs/swiftui-core.md",
+            browserPath: "../docs/swiftui-core.md",
+            expected: {}
         }
     ];
 
